@@ -1,6 +1,6 @@
 const http = require('http');
 const net = require('net');
-const PRINTER_IP = '192.168.1.105';
+const PRINTER_IP = '192.168.100.105';
 const PRINTER_PORT = 9100;
 const PROXY_PORT = 3100;
 
@@ -8,6 +8,7 @@ const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Private-Network', 'true');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
@@ -41,20 +42,12 @@ const server = http.createServer((req, res) => {
     });
 
     socket.on('close', () => {
-      if (!responded) {
-        responded = true;
-        res.writeHead(200);
-        res.end('OK');
-      }
+      if (!responded) { responded = true; res.writeHead(200); res.end('OK'); }
     });
 
     socket.on('error', (err) => {
       console.error('Printer error:', err.message);
-      if (!responded) {
-        responded = true;
-        res.writeHead(500);
-        res.end('Printer error: ' + err.message);
-      }
+      if (!responded) { responded = true; res.writeHead(500); res.end('Printer error: ' + err.message); }
     });
   });
 });
